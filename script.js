@@ -64,30 +64,45 @@ function ranAge(db,choose_cnt){
 	return retarr;
 }
 
+function printFileInfo(e){
+	var f = e.target.files[0];
+	var fsp = f.name.split(".");
+	if(fsp[fsp.length-1].toUpperCase() != "CSV"){
+		document.getElementById('fileinfo').innerHTML = '<p>Invalid csv file!</p>';
+	} else {
+		document.getElementById('fileinfo').innerHTML = "<p>" + f.name + ", Size : " + f.size + "Bytes</p>"
+	}
+}
 
 function readSingleFile(evt){
-	var f = evt.target.files[0];
+	var f = document.getElementById("csvupload").files[0];
 	if(f){
 		var r = new FileReader();
 		r.onload = function (e){
 			var txt = e.target.result;
 			console.log("Upload successful");
 			console.log(f.name + " " + f.size);
-			var lines = txt.split("\n"), output = [];
-			for (var i = 0;i<lines.length-1;i++){
-				output.push("<tr><td>" + lines[i].split(",").join("</td><td>") + "</td></tr>");
+			var lines = txt.split("\n");
+			var table = document.createElement("table");
+			for (var i = 0;i<lines.length;i++){
+				var tr = document.createElement("tr");
+				var tdcontents = lines[i].split(",");
+				for (var j = 0;j<tdcontents.length;j++){
+					var td = document.createElement("td");
+					td.innerText = tdcontents[j];
+					tr.appendChild(td);
+				}
+				table.appendChild(tr);
 			}
-			output = "<table>" + output.join("") + "</table>";
-			document.write(output);
+			document.getElementById("list").appendChild(table);
 		}
 		r.readAsText(f);
-	} else {
-		console.log("error loading file");
 	}
 }
 
 function onll(){
-	document.getElementById("csvupload").addEventListener('change',readSingleFile)
+	document.getElementById("theform").addEventListener('submit',readSingleFile,false);
+	document.getElementById("csvupload").addEventListener('change',printFileInfo);
 }
 
 
